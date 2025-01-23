@@ -10,32 +10,41 @@
     background-color: #2d2d2d;
     color: #ddd;
   }
-  
+
   .site-header {
     border-bottom: 1px solid #444;
   }
-  
-  .site-title, .site-nav .page-link {
+
+  .site-title {
+    color: #fff;
+
+    &:visited {
+      color: #fff;
+    }
+  }
+
+  .site-nav .page-link {
     color: #ddd;
   }
-  
+
   a {
     color: #79b8ff;
-    
+
     &:visited {
       color: #b392f0;
     }
   }
-  
+
   .post-link {
     color: #79b8ff;
   }
-  
+
   .post-meta {
     color: #959396;
   }
-  
-  pre, code {
+
+  pre,
+  code {
     background-color: #3a3a3a;
   }
 }
