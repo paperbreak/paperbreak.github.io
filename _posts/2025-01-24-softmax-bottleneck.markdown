@@ -22,6 +22,7 @@ $$
 & = & \log \text{Softmax} ( H_\theta W_\theta^\top ) \\
 \end{align}
 $$
+
 Where $W_\theta$ is our embedding weights, and $H_\theta$ is our context vectors (output of the final layer of our NN *before* the output embedding).
 Essentially, this boils down to a matrix factorization problem - we are trying to approximate the theoretical distribution on the left as a product of two
 matricies on the right.
@@ -43,6 +44,7 @@ be able to accurately approximate the true distribution $\Pr(X \vert C)$.
 Note: here we use the notation $\Pr^*$ to denote the true distribution. In practice, we don't know what the true distribution is - we are trying to solve for it.
 
 2) Let $F(A)$ be the set of *row-wise* shifts of the matrix $A$:
+
 $$
 \begin{align}
 F(A) & = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} \\
@@ -57,7 +59,7 @@ and definition (4) is more useful for one of our proofs later.
 
 ## Properties
 
-### (1) For any matrix $A', A' \in F(A) \iff \text{Softmax}(A') = \Pr^*(X|C)$
+1) For any matrix $A', A' \in F(A) \iff \text{Softmax}(A') = \Pr^*(X|C)$
 
 The set $F(A)$ defines the set of all logits that correspond to the true probability distribution $\Pr^*$.  This means our logits $H_\theta W_\theta^\top$ have to be in the set $F(A)$ for our NN to be able to approximate the true distribution $\Pr^*$.
 
@@ -91,7 +93,7 @@ $$
 $$
 
 
-### (2) $\forall A^1 \neq A^2 \in F(A), \vert \text{rank}(A^1) - \text{rank}(A^2) \vert \leq 1$
+2) $\forall A^1 \neq A^2 \in F(A), \vert \text{rank}(A^1) - \text{rank}(A^2) \vert \leq 1$
 
 This is saying that all matrices that belong to the set $F(A)$ have a similar rank. This is not surprising - every matrix in $F(A)$ is simply *row-wise* shifted by some constant factor.
 
