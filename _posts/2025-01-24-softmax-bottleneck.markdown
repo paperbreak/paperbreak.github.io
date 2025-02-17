@@ -59,7 +59,7 @@ and definition (4) is more useful for one of our proofs later.
 
 ## Properties
 
-1) For any matrix $A', A' \in F(A) \iff \text{Softmax}(A') = \Pr^*(X|C)$
+1) For any matrix $A'$, $A' \in F(A) \iff \text{Softmax}(A') = \Pr^*(X \vert C)$
 
 The set $F(A)$ defines the set of all logits that correspond to the true probability distribution $\Pr^*$.  This means our logits $H_\theta W_\theta^\top$ have to be in the set $F(A)$ for our NN to be able to approximate the true distribution $\Pr^*$.
 
