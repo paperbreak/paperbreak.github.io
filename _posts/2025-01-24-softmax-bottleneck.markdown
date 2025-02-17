@@ -81,6 +81,7 @@ Note: Softmax is shift-invariant (line 3)
 
 
 $\impliedby$
+
 $$
 \begin{aligned}
 & \text{Softmax}(A') &=& \Pr^*(X \vert C) \\
