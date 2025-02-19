@@ -5,7 +5,7 @@ date:   2025-02-18
 categories: [theory, language modeling]
 ---
 
-This post is a breakdown of the paper [Breaking the Softmax Bottleneck: A High-Rank RNN Language Model](https://arxiv.org/abs/1711.03953)
+A breakdown of the paper [Breaking the Softmax Bottleneck: A High-Rank RNN Language Model](https://arxiv.org/abs/1711.03953)
 
 # Background
 
@@ -107,15 +107,15 @@ $\implies$
 
 $$
 \begin{aligned}
-    & \text{Given } A_1 \neq A_2 \in F(A) \\
-    & A_1 = A + \Lambda_1 \mathbb{J}_{m,n} \\
-    & A_2 = A + \Lambda_2 \mathbb{J}_{m,n} \\
-    & \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} \\
-    & \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) \\
-    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) \\
-    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) \\
-    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 \\
-    & \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 \\
-    & \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare \\
+    & \text{Given } A_1 \neq A_2 \in F(A) & (1) \\
+    & A_1 = A + \Lambda_1 \mathbb{J}_{m,n} & (2) \\
+    & A_2 = A + \Lambda_2 \mathbb{J}_{m,n} & (3) \\
+    & \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} & (4) \\
+    & \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) & (5) \\
+    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) & (6) \\
+    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) & (7) \\
+    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 & (8) \\
+    & \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 & (9) \\
+    & \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare & (10) \\
 \end{aligned}
 $$
