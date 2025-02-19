@@ -65,7 +65,7 @@ and definition (2) is more useful for one of our proofs later.
 
 1) For any matrix $A'$, $A' \in F(A) \iff \text{Softmax}(A') = \mathbb{P}^*(X \vert C)$
 
-The set $F(A)$ defines the set of all logits that correspond to the true probability distribution $ \mathbb{P}^* $.  This means our logits $H_\theta W_\theta^\top$ have to be in the set $F(A)$ for our NN to be able to approximate the true distribution $\mathbb{P}^*$.
+The set $F(A)$ defines the set of all logits that correspond to the true probability distribution $\mathbb{P}^*$.  This means our logits $H_\theta W_\theta^\top$ have to be in the set $F(A)$ for our NN to be able to approximate the true distribution $\mathbb{P}^*$.
 
 
 $\implies$
