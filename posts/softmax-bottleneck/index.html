@@ -148,7 +148,7 @@ window.Quarto = {
 
 
 
-<p>This post is a breakdown of the paper <a href="https://arxiv.org/abs/1711.03953">Breaking the Softmax Bottleneck: A High-Rank RNN Language Model</a></p>
+<p>A breakdown of the paper <a href="https://arxiv.org/abs/1711.03953">Breaking the Softmax Bottleneck: A High-Rank RNN Language Model</a></p>
 <section id="background" class="level1">
 <h1>Background</h1>
 <p>When doing Language Modeling, we try and train a model to learn the conditional next-token distribution <span class="math inline">\(\mathbb{P}(X \vert C)\)</span>, where <span class="math inline">\(X= \lbrace x_1, \dots , x_m \rbrace\)</span> is our vocabulary (set of tokens) and <span class="math inline">\(C = \lbrace c_1, \dots, c_n \rbrace\)</span> is the set of contexts. What the set <span class="math inline">\(C\)</span> looks like is based on the type of language modeling we want to perform, for example left-to-right or masked language modeling. In general, the context is just the tokens surrounding a particular token.</p>
@@ -223,16 +223,16 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
-    &amp; \text{Given } A_1 \neq A_2 \in F(A) \\
-    &amp; A_1 = A + \Lambda_1 \mathbb{J}_{m,n} \\
-    &amp; A_2 = A + \Lambda_2 \mathbb{J}_{m,n} \\
-    &amp; \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} \\
-    &amp; \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) \\
-    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) \\
-    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) \\
-    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 \\
-    &amp; \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 \\
-    &amp; \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare \\
+    &amp; \text{Given } A_1 \neq A_2 \in F(A) &amp; (1) \\
+    &amp; A_1 = A + \Lambda_1 \mathbb{J}_{m,n} &amp; (2) \\
+    &amp; A_2 = A + \Lambda_2 \mathbb{J}_{m,n} &amp; (3) \\
+    &amp; \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} &amp; (4) \\
+    &amp; \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) &amp; (5) \\
+    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) &amp; (6) \\
+    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) &amp; (7) \\
+    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 &amp; (8) \\
+    &amp; \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 &amp; (9) \\
+    &amp; \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare &amp; (10) \\
 \end{aligned}
 \]</span></p>
 
