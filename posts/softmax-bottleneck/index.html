@@ -188,9 +188,9 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp
 </section>
 <section id="properties" class="level2">
 <h2 class="anchored" data-anchor-id="properties">Properties</h2>
-<ol type="1">
-<li>For any matrix <span class="math inline">\(A'\)</span>, <span class="math inline">\(A' \in F(A) \iff \text{Softmax}(A') = \mathbb{P}^*(X \vert C)\)</span></li>
-</ol>
+<section id="property-1" class="level3">
+<h3 class="anchored" data-anchor-id="property-1">Property 1</h3>
+<p>For any matrix <span class="math inline">\(A'\)</span>, <span class="math inline">\(A' \in F(A) \iff \text{Softmax}(A') = \mathbb{P}^*(X \vert C)\)</span></p>
 <p>The set <span class="math inline">\(F(A)\)</span> defines the set of all logits that correspond to the true probability distribution <span class="math inline">\(\mathbb{P}^*\)</span>. This means our logits <span class="math inline">\(H_\theta W_\theta^\top\)</span> have to be in the set <span class="math inline">\(F(A)\)</span> for our NN to be able to approximate the true distribution <span class="math inline">\(\mathbb{P}^*\)</span>.</p>
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
@@ -216,9 +216,17 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp
 \end{aligned}
 \]</span></p>
 <p>Note: Line (4) above is abuse of notation - Softmax of a matrix is generally understood to be applied <em>row-wise</em>.</p>
-<ol start="2" type="1">
-<li><span class="math inline">\(\forall A_1 \neq A_2 \in F(A), \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1\)</span></li>
-</ol>
+</section>
+<section id="lemma-1" class="level3">
+<h3 class="anchored" data-anchor-id="lemma-1">Lemma 1</h3>
+<p>It follows immediately from property 1 that given model parameters <span class="math inline">\(\theta\)</span></p>
+<p><span class="math display">\[
+H_\theta W_\theta^\top \in F(A) \iff \mathbb{P}_\theta(X \vert C) = \mathbb{P}^*(X \vert C)
+\]</span></p>
+</section>
+<section id="property-2" class="level3">
+<h3 class="anchored" data-anchor-id="property-2">Property 2</h3>
+<p><span class="math inline">\(\forall A_1 \neq A_2 \in F(A), \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1\)</span></p>
 <p>This is saying that all matrices that belong to the set <span class="math inline">\(F(A)\)</span> have a similar rank. This is not surprising - every matrix in <span class="math inline">\(F(A)\)</span> is simply <em>row-wise</em> shifted by some constant factor.</p>
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
@@ -235,6 +243,11 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp
     &amp; \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare &amp; (10) \\
 \end{aligned}
 \]</span></p>
+</section>
+</section>
+<section id="the-softmax-bottleneck" class="level2">
+<h2 class="anchored" data-anchor-id="the-softmax-bottleneck">The Softmax Bottleneck</h2>
+<p>We can now combine the properties above to prove the existance of the softmax bottleneck:</p>
 
 
 </section>
