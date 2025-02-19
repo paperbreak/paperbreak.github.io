@@ -63,10 +63,11 @@ and definition (2) is more useful for one of our proofs later.
 
 ## Properties
 
-1) For any matrix $A'$, $A' \in F(A) \iff \text{Softmax}(A') = \mathbb{P}^*(X \vert C)$
+### Property 1
+
+For any matrix $A'$, $A' \in F(A) \iff \text{Softmax}(A') = \mathbb{P}^*(X \vert C)$
 
 The set $F(A)$ defines the set of all logits that correspond to the true probability distribution $\mathbb{P}^*$.  This means our logits $H_\theta W_\theta^\top$ have to be in the set $F(A)$ for our NN to be able to approximate the true distribution $\mathbb{P}^*$.
-
 
 $\implies$
 
@@ -83,7 +84,6 @@ $$
 
 Note: Softmax is shift-invariant (line 3)
 
-
 $\impliedby$
 
 $$
@@ -99,7 +99,17 @@ $$
 
 Note: Line (4) above is abuse of notation - Softmax of a matrix is generally understood to be applied *row-wise*.
 
-2) $\forall A_1 \neq A_2 \in F(A), \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1$
+### Lemma 1
+
+It follows immediately from property 1 that given model parameters $\theta$
+
+$$
+H_\theta W_\theta^\top \in F(A) \iff \mathbb{P}_\theta(X \vert C) = \mathbb{P}^*(X \vert C)
+$$
+
+### Property 2
+
+$\forall A_1 \neq A_2 \in F(A), \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1$
 
 This is saying that all matrices that belong to the set $F(A)$ have a similar rank. This is not surprising - every matrix in $F(A)$ is simply *row-wise* shifted by some constant factor.
 
@@ -119,3 +129,7 @@ $$
     & \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare & (10) \\
 \end{aligned}
 $$
+
+## The Softmax Bottleneck
+
+We can now combine the properties above to prove the existance of the softmax bottleneck:
