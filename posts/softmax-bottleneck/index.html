@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="">
+<meta name="author" content="C.H.">
 <meta name="dcterms.date" content="2025-02-18">
 
 <title>Breaking the Softmax Bottleneck – blog</title>
@@ -119,6 +119,12 @@ window.Quarto = {
   
   <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>C.H. </p>
+            </div>
+    </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
@@ -142,17 +148,17 @@ window.Quarto = {
 
 
 
-<p><a href="https://arxiv.org/abs/1711.03953">Breaking the Softmax Bottleneck: A High-Rank RNN Language Model</a></p>
+<p>This post is a breakdown of the paper <a href="https://arxiv.org/abs/1711.03953">Breaking the Softmax Bottleneck: A High-Rank RNN Language Model</a></p>
 <section id="background" class="level1">
 <h1>Background</h1>
 <p>When doing Language Modeling, we try and train a model to learn the conditional next-token distribution <span class="math inline">\(\mathbb{P}(X \vert C)\)</span>, where <span class="math inline">\(X= \lbrace x_1, \dots , x_m \rbrace\)</span> is our vocabulary (set of tokens) and <span class="math inline">\(C = \lbrace c_1, \dots, c_n \rbrace\)</span> is the set of contexts. What the set <span class="math inline">\(C\)</span> looks like is based on the type of language modeling we want to perform, for example left-to-right or masked language modeling. In general, the context is just the tokens surrounding a particular token.</p>
 <p>We can visualize this distribution as a matrix, with the number of rows being equal to the number of unique tokens <span class="math inline">\(m\)</span>, and the number of columns being equal to the number of unique contexts <span class="math inline">\(n\)</span>. Each entry at position <span class="math inline">\((i, j)\)</span> represents the probability of token <span class="math inline">\(x_i\)</span> appearing in context <span class="math inline">\(c_j\)</span>.</p>
 <p>The way we train our NN to fit this distribution is in the following way:</p>
 <p><span class="math display">\[
-\begin{align}
-\log \mathbb{P}(X \vert C) &amp; \approx &amp; \log \mathbb{P}_\theta(X \vert C) \\
-&amp; = &amp; \log \text{Softmax} ( H_\theta W_\theta^\top ) \\
-\end{align}
+\begin{aligned}
+\log \mathbb{P}(X \vert C) &amp; \approx \log \mathbb{P}_\theta(X \vert C) \\
+&amp; = \log \text{Softmax} ( H_\theta W_\theta^\top ) \\
+\end{aligned}
 \]</span></p>
 <p>Where <span class="math inline">\(W_\theta\)</span> is our embedding weights, and <span class="math inline">\(H_\theta\)</span> is our context vectors (output of the final layer of our NN <em>before</em> the output embedding). Essentially, this boils down to a matrix factorization problem - we are trying to approximate the theoretical distribution on the left as a product of two matricies on the right.</p>
 <p>Looking deeper, when we initialize the embedding weights <span class="math inline">\(W_\theta\)</span>, we have to also pick their dimension size <span class="math inline">\(d\)</span>. Therefore <span class="math inline">\(W_\theta \in \mathbb{R}^{m \times d}\)</span> and <span class="math inline">\(H_\theta \in \mathbb{R}^{n \times d}\)</span>. This means we are performing a <a href="https://en.wikipedia.org/wiki/Rank_factorization">Rank Factorization</a> of <span class="math inline">\(\mathbb{P}(X \vert C)\)</span>, and <span class="math inline">\(\text{rank}(\mathbb{P}(X \vert C)) = d\)</span>.</p>
@@ -171,12 +177,14 @@ window.Quarto = {
 </ol>
 <p><span class="math display">\[
 \begin{align}
-F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} \\
-&amp; = \{ A + \Lambda J_{m,n} \space \vert \space \Lambda \text{ is diagonal}, \Lambda \in \mathbb{R}^{n \times n} \}
+F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp; (1) \\
+&amp; = \{ A + \Lambda J_{m,n} \space \vert \space \Lambda \text{ is diagonal}, \Lambda \in \mathbb{R}^{n \times n} \} &amp; (2)
 \end{align}
 \]</span></p>
-<p>At first glance, the set <span class="math inline">\(F(A)\)</span> will seem very unnatural. # TODO – finish this</p>
-<p>Note: I wrote two equivalent definitions for <span class="math inline">\(A\)</span> for (3) and (4) - definition (3) is easier to understand, and definition (4) is more useful for one of our proofs later.</p>
+<p>At first glance, the set <span class="math inline">\(F(A)\)</span> might seem very unnatural - but it essentially just represents the idea that Softmax is shift-invariant: <span class="math display">\[
+\text{Softmax}(\vec x) = \frac{\exp(\vec x)}{\sum_j \exp(x_j)}
+\]</span> If we shift each element of <span class="math inline">\(\vec x\)</span> by the same value <span class="math inline">\(c\)</span>, formally <span class="math inline">\(\vec x + \vec c\)</span> where <span class="math inline">\(\vec c = [c, c, \dots, c]\)</span>, then <span class="math inline">\(\text{Softmax}(\vec x + \vec c) = \text{Softmax}(\vec x)\)</span>. <span class="math inline">\(F(A)\)</span> is just the matrix form of this idea.</p>
+<p>Note: I wrote two equivalent definitions for <span class="math inline">\(A\)</span> for (1) and (2) - definition (1) is easier to understand, and definition (2) is more useful for one of our proofs later.</p>
 </section>
 <section id="properties" class="level2">
 <h2 class="anchored" data-anchor-id="properties">Properties</h2>
@@ -187,32 +195,46 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} \\
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
-    &amp;  A' &amp;\in&amp; F(A) \\
-    \implies &amp; A' &amp;=&amp; A + C \\
-    \implies &amp; \text{Softmax}(A') &amp;=&amp; \text{Softmax}(A + C) \\
-    &amp; &amp;=&amp; \text{Softmax}(A) \\
-    &amp; &amp;=&amp; \text{Softmax}(\log \mathbb{P}^*(X \vert C)) \\
-    &amp; &amp;=&amp; \mathbb{P}^*(X \vert C) \quad \blacksquare
+    &amp;  A' &amp;\in&amp; F(A) &amp; (1) \\
+    \implies &amp; A' &amp;=&amp; A + C &amp; (2) \\
+    \implies &amp; \text{Softmax}(A') &amp;=&amp; \text{Softmax}(A + C) &amp; (3) \\
+    &amp; &amp;=&amp; \text{Softmax}(A) &amp; (4) \\
+    &amp; &amp;=&amp; \text{Softmax}(\log \mathbb{P}^*(X \vert C)) &amp; (5) \\
+    &amp; &amp;=&amp; \mathbb{P}^*(X \vert C) \quad \blacksquare &amp; (6) &amp;
 \end{aligned}
 \]</span></p>
 <p>Note: Softmax is shift-invariant (line 3)</p>
 <p><span class="math inline">\(\impliedby\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
-&amp; \text{Softmax}(A') &amp;=&amp; \mathbb{P}^*(X \vert C) \\
-\implies &amp; \log \text{Softmax}(A') &amp;=&amp; \log \mathbb{P}^*(X \vert C) \\
-\implies &amp; \log \text{Softmax}(A') &amp;=&amp; A \\
-\implies &amp; A' + \log \Sigma \exp(A') &amp;=&amp; A \\
-\implies &amp; A' &amp;=&amp; A - \log \Sigma \exp(A') \\
-&amp; &amp;\in&amp; \space F(A) \quad \blacksquare
+&amp; \text{Softmax}(A') &amp;=&amp; \mathbb{P}^*(X \vert C) &amp; (1) \\
+\implies &amp; \log \text{Softmax}(A') &amp;=&amp; \log \mathbb{P}^*(X \vert C) &amp; (2) \\
+\implies &amp; \log \text{Softmax}(A') &amp;=&amp; A &amp; (3) \\
+\implies &amp; A' + \log \Sigma \exp(A') &amp;=&amp; A &amp; (4) \\
+\implies &amp; A' &amp;=&amp; A - \log \Sigma \exp(A') &amp; (5) \\
+&amp; &amp;\in&amp; \space F(A)  \quad \blacksquare &amp; (6) &amp;
 \end{aligned}
 \]</span></p>
+<p>Note: Line (4) above is abuse of notation - Softmax of a matrix is generally understood to be applied <em>row-wise</em>.</p>
 <ol start="2" type="1">
-<li><span class="math inline">\(\forall A^1 \neq A^2 \in F(A), \vert \text{rank}(A^1) - \text{rank}(A^2) \vert \leq 1\)</span></li>
+<li><span class="math inline">\(\forall A_1 \neq A_2 \in F(A), \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1\)</span></li>
 </ol>
 <p>This is saying that all matrices that belong to the set <span class="math inline">\(F(A)\)</span> have a similar rank. This is not surprising - every matrix in <span class="math inline">\(F(A)\)</span> is simply <em>row-wise</em> shifted by some constant factor.</p>
 <p><span class="math inline">\(\implies\)</span></p>
-<p>TODO – finish</p>
+<p><span class="math display">\[
+\begin{aligned}
+    &amp; \text{Given } A_1 \neq A_2 \in F(A) \\
+    &amp; A_1 = A + \Lambda_1 \mathbb{J}_{m,n} \\
+    &amp; A_2 = A + \Lambda_2 \mathbb{J}_{m,n} \\
+    &amp; \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} \\
+    &amp; \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) \\
+    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) \\
+    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) \\
+    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 \\
+    &amp; \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 \\
+    &amp; \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare \\
+\end{aligned}
+\]</span></p>
 
 
 </section>
@@ -309,7 +331,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("git@github-paperbreak:paperbreak\/paperbreak\.github\.io\.git");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
