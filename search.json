@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "PaperBreak",
+    "section": "",
+    "text": "Breaking the Softmax Bottleneck\n\n\n\n\n\n\ntheory\n\n\nlanguage modeling\n\n\n\n\n\n\n\n\n\nFeb 18, 2025\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/softmax-bottleneck/index.html",
+    "href": "posts/softmax-bottleneck/index.html",
+    "title": "Breaking the Softmax Bottleneck",
+    "section": "",
+    "text": "Breaking the Softmax Bottleneck: A High-Rank RNN Language Model"
+  },
+  {
+    "objectID": "posts/softmax-bottleneck/index.html#definitions",
+    "href": "posts/softmax-bottleneck/index.html#definitions",
+    "title": "Breaking the Softmax Bottleneck",
+    "section": "Definitions",
+    "text": "Definitions\n\nLet \\(A = \\log \\mathbb{P}^*(X \\vert C)\\)\n\nNote: here we use the notation \\(\\mathbb{P}^*\\) to denote the true distribution. In practice, we don’t know what the true distribution is - we are trying to solve for it.\n\nLet \\(F(A)\\) be the set of row-wise shifts of the matrix \\(A\\):\n\n\\[\n\\begin{align}\nF(A) & = \\{ A + C \\space \\vert \\space C_{i,:} = c, c \\in \\mathbb{R}  \\} \\\\\n& = \\{ A + \\Lambda J_{m,n} \\space \\vert \\space \\Lambda \\text{ is diagonal}, \\Lambda \\in \\mathbb{R}^{n \\times n} \\}\n\\end{align}\n\\]\nAt first glance, the set \\(F(A)\\) will seem very unnatural. # TODO – finish this\nNote: I wrote two equivalent definitions for \\(A\\) for (3) and (4) - definition (3) is easier to understand, and definition (4) is more useful for one of our proofs later."
+  },
+  {
+    "objectID": "posts/softmax-bottleneck/index.html#properties",
+    "href": "posts/softmax-bottleneck/index.html#properties",
+    "title": "Breaking the Softmax Bottleneck",
+    "section": "Properties",
+    "text": "Properties\n\nFor any matrix \\(A'\\), \\(A' \\in F(A) \\iff \\text{Softmax}(A') = \\mathbb{P}^*(X \\vert C)\\)\n\nThe set \\(F(A)\\) defines the set of all logits that correspond to the true probability distribution $ ^* $. This means our logits \\(H_\\theta W_\\theta^\\top\\) have to be in the set \\(F(A)\\) for our NN to be able to approximate the true distribution \\(\\mathbb{P}^*\\).\n\\(\\implies\\)\n\\[\n\\begin{aligned}\n    &  A' &\\in& F(A) \\\\\n    \\implies & A' &=& A + C \\\\\n    \\implies & \\text{Softmax}(A') &=& \\text{Softmax}(A + C) \\\\\n    & &=& \\text{Softmax}(A) \\\\\n    & &=& \\text{Softmax}(\\log \\mathbb{P}^*(X \\vert C)) \\\\\n    & &=& \\mathbb{P}^*(X \\vert C) \\quad \\blacksquare\n\\end{aligned}\n\\]\nNote: Softmax is shift-invariant (line 3)\n\\(\\impliedby\\)\n\\[\n\\begin{aligned}\n& \\text{Softmax}(A') &=& \\mathbb{P}^*(X \\vert C) \\\\\n\\implies & \\log \\text{Softmax}(A') &=& \\log \\mathbb{P}^*(X \\vert C) \\\\\n\\implies & \\log \\text{Softmax}(A') &=& A \\\\\n\\implies & A' + \\log \\Sigma \\exp(A') &=& A \\\\\n\\implies & A' &=& A - \\log \\Sigma \\exp(A') \\\\\n& &\\in& \\space F(A) \\quad \\blacksquare\n\\end{aligned}\n\\]\n\n\\(\\forall A^1 \\neq A^2 \\in F(A), \\vert \\text{rank}(A^1) - \\text{rank}(A^2) \\vert \\leq 1\\)\n\nThis is saying that all matrices that belong to the set \\(F(A)\\) have a similar rank. This is not surprising - every matrix in \\(F(A)\\) is simply row-wise shifted by some constant factor.\n\\(\\implies\\)\nTODO – finish"
+  }
+]
