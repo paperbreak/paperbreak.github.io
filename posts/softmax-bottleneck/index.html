@@ -191,7 +191,7 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp
 <ol type="1">
 <li>For any matrix <span class="math inline">\(A'\)</span>, <span class="math inline">\(A' \in F(A) \iff \text{Softmax}(A') = \mathbb{P}^*(X \vert C)\)</span></li>
 </ol>
-<p>The set <span class="math inline">\(F(A)\)</span> defines the set of all logits that correspond to the true probability distribution $ ^* $. This means our logits <span class="math inline">\(H_\theta W_\theta^\top\)</span> have to be in the set <span class="math inline">\(F(A)\)</span> for our NN to be able to approximate the true distribution <span class="math inline">\(\mathbb{P}^*\)</span>.</p>
+<p>The set <span class="math inline">\(F(A)\)</span> defines the set of all logits that correspond to the true probability distribution <span class="math inline">\(\mathbb{P}^*\)</span>. This means our logits <span class="math inline">\(H_\theta W_\theta^\top\)</span> have to be in the set <span class="math inline">\(F(A)\)</span> for our NN to be able to approximate the true distribution <span class="math inline">\(\mathbb{P}^*\)</span>.</p>
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
