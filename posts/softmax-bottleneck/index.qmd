@@ -5,7 +5,7 @@ date:   2025-02-18
 categories: [theory, language modeling]
 ---
 
-A breakdown of the paper [Breaking the Softmax Bottleneck: A High-Rank RNN Language Model](https://arxiv.org/abs/1711.03953)
+A breakdown of the theoretical portion of the paper [Breaking the Softmax Bottleneck: A High-Rank RNN Language Model](https://arxiv.org/abs/1711.03953)
 
 # Background
 
@@ -13,7 +13,7 @@ When doing Language Modeling, we try and train a model to learn the conditional 
 
 We can visualize this distribution as a matrix, with the number of rows being equal to the number of unique tokens $m$, and the number of columns being equal to the number of unique contexts $n$. Each entry at position $(i, j)$ represents the probability of token $x_i$ appearing in context $c_j$.
 
-The way we train our NN to fit this distribution is in the following way:
+We train our NN to find weights that get as close as possible to the theoretical distribution:
 
 $$
 \begin{aligned}
@@ -23,8 +23,7 @@ $$
 $$
 
 Where $W_\theta$ is our embedding weights, and $H_\theta$ is our context vectors (output of the final layer of our NN *before* the output embedding).
-Essentially, this boils down to a matrix factorization problem - we are trying to approximate the theoretical distribution on the left as a product of two
-matricies on the right.
+Essentially, this boils down to a matrix factorization problem - we are trying to approximate the theoretical distribution on the left as a product of two matricies on the right.
 
 Looking deeper, when we initialize the embedding weights $W_\theta$, we have to also pick their dimension size $d$. 
 Therefore $W_\theta \in \mathbb{R}^{m \times d}$ and $H_\theta \in \mathbb{R}^{n \times d}$. This means we are performing a 
@@ -73,12 +72,12 @@ $\implies$
 
 $$
 \begin{aligned}
-    &  A' &\in& F(A) & (1) \\
-    \implies & A' &=& A + C & (2) \\
-    \implies & \text{Softmax}(A') &=& \text{Softmax}(A + C) & (3) \\
-    & &=& \text{Softmax}(A) & (4) \\
-    & &=& \text{Softmax}(\log \mathbb{P}^*(X \vert C)) & (5) \\
-    & &=& \mathbb{P}^*(X \vert C) \quad \blacksquare & (6) &
+& & A' &\in F(A) & (1) \\
+\implies & & A' &= A + C & (2) \\
+\implies & & \text{Softmax}(A') &= \text{Softmax}(A + C) & (3) \\
+& & &= \text{Softmax}(A) & (4) \\
+& & &= \text{Softmax}(\log \mathbb{P}^*(X \vert C)) & (5) \\
+& & &= \mathbb{P}^*(X \vert C) \quad \blacksquare & (6)
 \end{aligned}
 $$
 
@@ -88,16 +87,16 @@ $\impliedby$
 
 $$
 \begin{aligned}
-& \text{Softmax}(A') &=& \mathbb{P}^*(X \vert C) & (1) \\
-\implies & \log \text{Softmax}(A') &=& \log \mathbb{P}^*(X \vert C) & (2) \\
-\implies & \log \text{Softmax}(A') &=& A & (3) \\
-\implies & A' + \log \Sigma \exp(A') &=& A & (4) \\
-\implies & A' &=& A - \log \Sigma \exp(A') & (5) \\
-& &\in& \space F(A)  \quad \blacksquare & (6) &
+& & \text{Softmax}(A') &= \mathbb{P}^*(X \vert C) & (1) \\
+\implies & & \log \text{Softmax}(A') &= \log \mathbb{P}^*(X \vert C) & (2) \\
+\implies & & \log \text{Softmax}(A') &= A & (3) \\
+\implies & & A' + \log \Sigma \exp(A') &= A & (4) \\
+\implies & & A' &= A - \log \Sigma \exp(A') & (5) \\
+& & & \in \space F(A)  \quad \blacksquare & (6)
 \end{aligned}
 $$
 
-Note: Line (4) above is abuse of notation - Softmax of a matrix is generally understood to be applied *row-wise*.
+Note: Line (4) above is abuse of notation, specifically the $\Sigma \exp(A')$. This sum is applied row-wise.
 
 ### Lemma 1
 
@@ -117,19 +116,72 @@ $\implies$
 
 $$
 \begin{aligned}
-    & \text{Given } A_1 \neq A_2 \in F(A) & (1) \\
-    & A_1 = A + \Lambda_1 \mathbb{J}_{m,n} & (2) \\
-    & A_2 = A + \Lambda_2 \mathbb{J}_{m,n} & (3) \\
-    & \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} & (4) \\
-    & \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) & (5) \\
-    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) & (6) \\
-    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) & (7) \\
-    & \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 & (8) \\
-    & \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 & (9) \\
-    & \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare & (10) \\
+& & \text{Given } A_1 \neq A_2 &\in F(A) & (1) \\
+& & A_1 &= A + \Lambda_1 \mathbb{J}_{m,n} & (2) \\
+& & A_2 &= A + \Lambda_2 \mathbb{J}_{m,n} & (3) \\
+\implies & & A_1 &= A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} & (4) \\
+\implies & & \text{rank}(A_1) &= \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) & (5) \\
+& & &\leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) & (6) \\
+& & &\leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) & (7) \\
+& & &\leq \text{rank}(A_2) + 1 & (8) \\
+& & \text{similarly, we can find that} & & \\
+& & \text{rank}(A_2) &\leq \text{rank}(A_1) - 1 & (9) \\
+\implies & & \vert \text{rank}(A_1) - \text{rank}(A_2) \vert &\leq 1 \quad \blacksquare & (10)
 \end{aligned}
 $$
 
 ## The Softmax Bottleneck
 
 We can now combine the properties above to prove the existance of the softmax bottleneck:
+
+### Proposition 1
+
+$$
+\exists \space \theta \ni \mathbb{P}_\theta(X|C) = \mathbb{P}^*(X|C) \iff d \geq \min_{A' \in F(A)}\text{rank}(A')
+$$
+
+$\implies$
+
+$$
+\begin{aligned}
+& & \exists \space \theta \ni \mathbb{P}_\theta(X|C) &= \mathbb{P}^*(X|C) & (1) \\
+\underset{\tiny\text{Lemma 1}}{\implies} & & H_\theta W_\theta^\top &\in F(A) & (2) \\
+\implies & & \exists A' \in F(A) \ni H_\theta W_\theta^\top &= A' & (3) \\
+\implies & & \text{rank}(H_\theta W_\theta^\top) &= \text{rank}(A') & (4) \\
+\implies & & d &= \text{rank}(A') & (5) \\
+& & &\geq \min_{A'' \in F(A)} \text{rank}(A'') \quad \blacksquare & (6)
+\end{aligned}
+$$
+
+$\impliedby$
+
+$$
+\begin{aligned}
+& & d \geq \min_{A'' \in F(A)} &\text{rank}(A'') & & (1) \\
+&\implies & \exists A' &\in F(A) & & (2a) \\
+& & \exists H' &\in \mathbb{R}^{n \times d} & & (2b) \\
+& & \exists W' &\in \mathbb{R}^{m \times d} & & (2c) \\
+& & A' &= H'W' & & (2d) \\
+&\underset{\tiny\text{Univ. A.T.}}{\implies} & \exists \space \theta \ni H' &= H_\theta & & (3a) \\
+& & W' &= W_\theta & & (3b) \\
+&\underset{\tiny\text{Lemma 1}}{\implies} & \mathbb{P}_\theta(X|C) &= \mathbb{P}^*(X|C) & & (4)
+\end{aligned}
+$$
+
+### Corollary 1
+
+The **Softmax Bottleneck**:
+
+$$
+d < \text{rank}(A) - 1 \implies \forall \theta \space  \exists c \in C \ni \mathbb{P}_\theta(X|c) \neq \mathbb{P}^*(X|c)
+$$
+
+$\implies$
+
+$$
+\begin{aligned}
+& & d &< \text{rank}(A) - 1 & & (1) \\
+&\underset{\tiny\text{Property 2}}{\implies} & H_\theta W_\theta^\top &\notin F(A) & & (2) \\
+&\underset{\tiny\text{Proposition 1}}{\implies} & \forall \theta \space \exists c \in C \ni \mathbb{P}_\theta(X|c) &\neq \mathbb{P}^*(X|c) & & (3)
+\end{aligned}
+$$
