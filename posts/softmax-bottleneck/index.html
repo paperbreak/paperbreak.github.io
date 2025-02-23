@@ -148,12 +148,12 @@ window.Quarto = {
 
 
 
-<p>A breakdown of the paper <a href="https://arxiv.org/abs/1711.03953">Breaking the Softmax Bottleneck: A High-Rank RNN Language Model</a></p>
+<p>A breakdown of the theoretical portion of the paper <a href="https://arxiv.org/abs/1711.03953">Breaking the Softmax Bottleneck: A High-Rank RNN Language Model</a></p>
 <section id="background" class="level1">
 <h1>Background</h1>
 <p>When doing Language Modeling, we try and train a model to learn the conditional next-token distribution <span class="math inline">\(\mathbb{P}(X \vert C)\)</span>, where <span class="math inline">\(X= \lbrace x_1, \dots , x_m \rbrace\)</span> is our vocabulary (set of tokens) and <span class="math inline">\(C = \lbrace c_1, \dots, c_n \rbrace\)</span> is the set of contexts. What the set <span class="math inline">\(C\)</span> looks like is based on the type of language modeling we want to perform, for example left-to-right or masked language modeling. In general, the context is just the tokens surrounding a particular token.</p>
 <p>We can visualize this distribution as a matrix, with the number of rows being equal to the number of unique tokens <span class="math inline">\(m\)</span>, and the number of columns being equal to the number of unique contexts <span class="math inline">\(n\)</span>. Each entry at position <span class="math inline">\((i, j)\)</span> represents the probability of token <span class="math inline">\(x_i\)</span> appearing in context <span class="math inline">\(c_j\)</span>.</p>
-<p>The way we train our NN to fit this distribution is in the following way:</p>
+<p>We train our NN to find weights that get as close as possible to the theoretical distribution:</p>
 <p><span class="math display">\[
 \begin{aligned}
 \log \mathbb{P}(X \vert C) &amp; \approx \log \mathbb{P}_\theta(X \vert C) \\
@@ -195,27 +195,27 @@ F(A) &amp; = \{ A + C \space \vert \space C_{i,:} = c, c \in \mathbb{R}  \} &amp
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
-    &amp;  A' &amp;\in&amp; F(A) &amp; (1) \\
-    \implies &amp; A' &amp;=&amp; A + C &amp; (2) \\
-    \implies &amp; \text{Softmax}(A') &amp;=&amp; \text{Softmax}(A + C) &amp; (3) \\
-    &amp; &amp;=&amp; \text{Softmax}(A) &amp; (4) \\
-    &amp; &amp;=&amp; \text{Softmax}(\log \mathbb{P}^*(X \vert C)) &amp; (5) \\
-    &amp; &amp;=&amp; \mathbb{P}^*(X \vert C) \quad \blacksquare &amp; (6) &amp;
+&amp; &amp; A' &amp;\in F(A) &amp; (1) \\
+\implies &amp; &amp; A' &amp;= A + C &amp; (2) \\
+\implies &amp; &amp; \text{Softmax}(A') &amp;= \text{Softmax}(A + C) &amp; (3) \\
+&amp; &amp; &amp;= \text{Softmax}(A) &amp; (4) \\
+&amp; &amp; &amp;= \text{Softmax}(\log \mathbb{P}^*(X \vert C)) &amp; (5) \\
+&amp; &amp; &amp;= \mathbb{P}^*(X \vert C) \quad \blacksquare &amp; (6)
 \end{aligned}
 \]</span></p>
 <p>Note: Softmax is shift-invariant (line 3)</p>
 <p><span class="math inline">\(\impliedby\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
-&amp; \text{Softmax}(A') &amp;=&amp; \mathbb{P}^*(X \vert C) &amp; (1) \\
-\implies &amp; \log \text{Softmax}(A') &amp;=&amp; \log \mathbb{P}^*(X \vert C) &amp; (2) \\
-\implies &amp; \log \text{Softmax}(A') &amp;=&amp; A &amp; (3) \\
-\implies &amp; A' + \log \Sigma \exp(A') &amp;=&amp; A &amp; (4) \\
-\implies &amp; A' &amp;=&amp; A - \log \Sigma \exp(A') &amp; (5) \\
-&amp; &amp;\in&amp; \space F(A)  \quad \blacksquare &amp; (6) &amp;
+&amp; &amp; \text{Softmax}(A') &amp;= \mathbb{P}^*(X \vert C) &amp; (1) \\
+\implies &amp; &amp; \log \text{Softmax}(A') &amp;= \log \mathbb{P}^*(X \vert C) &amp; (2) \\
+\implies &amp; &amp; \log \text{Softmax}(A') &amp;= A &amp; (3) \\
+\implies &amp; &amp; A' + \log \Sigma \exp(A') &amp;= A &amp; (4) \\
+\implies &amp; &amp; A' &amp;= A - \log \Sigma \exp(A') &amp; (5) \\
+&amp; &amp; &amp; \in \space F(A)  \quad \blacksquare &amp; (6)
 \end{aligned}
 \]</span></p>
-<p>Note: Line (4) above is abuse of notation - Softmax of a matrix is generally understood to be applied <em>row-wise</em>.</p>
+<p>Note: Line (4) above is abuse of notation, specifically the <span class="math inline">\(\Sigma \exp(A')\)</span>. This sum is applied row-wise.</p>
 </section>
 <section id="lemma-1" class="level3">
 <h3 class="anchored" data-anchor-id="lemma-1">Lemma 1</h3>
@@ -231,16 +231,17 @@ H_\theta W_\theta^\top \in F(A) \iff \mathbb{P}_\theta(X \vert C) = \mathbb{P}^*
 <p><span class="math inline">\(\implies\)</span></p>
 <p><span class="math display">\[
 \begin{aligned}
-    &amp; \text{Given } A_1 \neq A_2 \in F(A) &amp; (1) \\
-    &amp; A_1 = A + \Lambda_1 \mathbb{J}_{m,n} &amp; (2) \\
-    &amp; A_2 = A + \Lambda_2 \mathbb{J}_{m,n} &amp; (3) \\
-    &amp; \implies A_1 = A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} &amp; (4) \\
-    &amp; \implies \text{rank}(A_1) = \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) &amp; (5) \\
-    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) &amp; (6) \\
-    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) &amp; (7) \\
-    &amp; \phantom{\implies} \phantom{\text{rank}(A_1)} \leq \text{rank}(A_2) + 1 &amp; (8) \\
-    &amp; \text{similarly, we can find that } \text{rank}({A_2}) \leq \text{rank}(A_1) - 1 &amp; (9) \\
-    &amp; \implies \vert \text{rank}(A_1) - \text{rank}(A_2) \vert \leq 1 \quad \blacksquare &amp; (10) \\
+&amp; &amp; \text{Given } A_1 \neq A_2 &amp;\in F(A) &amp; (1) \\
+&amp; &amp; A_1 &amp;= A + \Lambda_1 \mathbb{J}_{m,n} &amp; (2) \\
+&amp; &amp; A_2 &amp;= A + \Lambda_2 \mathbb{J}_{m,n} &amp; (3) \\
+\implies &amp; &amp; A_1 &amp;= A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n} &amp; (4) \\
+\implies &amp; &amp; \text{rank}(A_1) &amp;= \text{rank}(A_2 + (\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) &amp; (5) \\
+&amp; &amp; &amp;\leq \text{rank}(A_2) + \text{rank}((\Lambda_1 - \Lambda_2)\mathbb{J}_{m,n}) &amp; (6) \\
+&amp; &amp; &amp;\leq \text{rank}(A_2) + \min(\text{rank}(\Lambda_1 - \Lambda_2),\text{rank}(\mathbb{J}_{m,n})) &amp; (7) \\
+&amp; &amp; &amp;\leq \text{rank}(A_2) + 1 &amp; (8) \\
+&amp; &amp; \text{similarly, we can find that} &amp; &amp; \\
+&amp; &amp; \text{rank}(A_2) &amp;\leq \text{rank}(A_1) - 1 &amp; (9) \\
+\implies &amp; &amp; \vert \text{rank}(A_1) - \text{rank}(A_2) \vert &amp;\leq 1 \quad \blacksquare &amp; (10)
 \end{aligned}
 \]</span></p>
 </section>
@@ -248,8 +249,53 @@ H_\theta W_\theta^\top \in F(A) \iff \mathbb{P}_\theta(X \vert C) = \mathbb{P}^*
 <section id="the-softmax-bottleneck" class="level2">
 <h2 class="anchored" data-anchor-id="the-softmax-bottleneck">The Softmax Bottleneck</h2>
 <p>We can now combine the properties above to prove the existance of the softmax bottleneck:</p>
+<section id="proposition-1" class="level3">
+<h3 class="anchored" data-anchor-id="proposition-1">Proposition 1</h3>
+<p><span class="math display">\[
+\exists \space \theta \ni \mathbb{P}_\theta(X|C) = \mathbb{P}^*(X|C) \iff d \geq \min_{A' \in F(A)}\text{rank}(A')
+\]</span></p>
+<p><span class="math inline">\(\implies\)</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp; &amp; \exists \space \theta \ni \mathbb{P}_\theta(X|C) &amp;= \mathbb{P}^*(X|C) &amp; (1) \\
+\underset{\tiny\text{Lemma 1}}{\implies} &amp; &amp; H_\theta W_\theta^\top &amp;\in F(A) &amp; (2) \\
+\implies &amp; &amp; \exists A' \in F(A) \ni H_\theta W_\theta^\top &amp;= A' &amp; (3) \\
+\implies &amp; &amp; \text{rank}(H_\theta W_\theta^\top) &amp;= \text{rank}(A') &amp; (4) \\
+\implies &amp; &amp; d &amp;= \text{rank}(A') &amp; (5) \\
+&amp; &amp; &amp;\geq \min_{A'' \in F(A)} \text{rank}(A'') \quad \blacksquare &amp; (6)
+\end{aligned}
+\]</span></p>
+<p><span class="math inline">\(\impliedby\)</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp; &amp; d \geq \min_{A'' \in F(A)} &amp;\text{rank}(A'') &amp; &amp; (1) \\
+&amp;\implies &amp; \exists A' &amp;\in F(A) &amp; &amp; (2a) \\
+&amp; &amp; \exists H' &amp;\in \mathbb{R}^{n \times d} &amp; &amp; (2b) \\
+&amp; &amp; \exists W' &amp;\in \mathbb{R}^{m \times d} &amp; &amp; (2c) \\
+&amp; &amp; A' &amp;= H'W' &amp; &amp; (2d) \\
+&amp;\underset{\tiny\text{Univ. A.T.}}{\implies} &amp; \exists \space \theta \ni H' &amp;= H_\theta &amp; &amp; (3a) \\
+&amp; &amp; W' &amp;= W_\theta &amp; &amp; (3b) \\
+&amp;\underset{\tiny\text{Lemma 1}}{\implies} &amp; \mathbb{P}_\theta(X|C) &amp;= \mathbb{P}^*(X|C) &amp; &amp; (4)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="corollary-1" class="level3">
+<h3 class="anchored" data-anchor-id="corollary-1">Corollary 1</h3>
+<p>The <strong>Softmax Bottleneck</strong>:</p>
+<p><span class="math display">\[
+d &lt; \text{rank}(A) - 1 \implies \forall \theta \space  \exists c \in C \ni \mathbb{P}_\theta(X|c) \neq \mathbb{P}^*(X|c)
+\]</span></p>
+<p><span class="math inline">\(\implies\)</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp; &amp; d &amp;&lt; \text{rank}(A) - 1 &amp; &amp; (1) \\
+&amp;\underset{\tiny\text{Property 2}}{\implies} &amp; H_\theta W_\theta^\top &amp;\notin F(A) &amp; &amp; (2) \\
+&amp;\underset{\tiny\text{Proposition 1}}{\implies} &amp; \forall \theta \space \exists c \in C \ni \mathbb{P}_\theta(X|c) &amp;\neq \mathbb{P}^*(X|c) &amp; &amp; (3)
+\end{aligned}
+\]</span></p>
 
 
+</section>
 </section>
 </section>
 
